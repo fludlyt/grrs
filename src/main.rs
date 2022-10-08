@@ -1,3 +1,4 @@
+use anyhow::{Context, Result};
 use clap::Parser;
 
 /// Search for a pattern in a file and display the lines that contain it.
@@ -9,10 +10,12 @@ struct Cli {
 	path: std::path::PathBuf,
 }
 
-fn main() -> Result<(), Box<dyn std::error::Error>> {
+fn main() -> Result<()> {
 	let args = Cli::parse();
+	let path = &args.path;
 
-	let content = std::fs::read_to_string(&args.path)?;
+	let content = std::fs::read_to_string(path)
+		.with_context(|| format!("could not read file `{}`", path.display()))?;
 	println!("file content: {}", content);
 	Ok(())
 }
